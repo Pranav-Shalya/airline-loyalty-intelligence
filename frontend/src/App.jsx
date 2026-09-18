@@ -37,15 +37,14 @@ function App() {
       </div>
 
       <h2>Priority Action Queue</h2>
-      <p style={{ color: '#666' }}>High-value customers exhibiting sudden flight deceleration, sorted by velocity drop.</p>
+      <p style={{ color: '#666' }}>High-value customers exhibiting sudden flight deceleration, sorted by 3-Month vs 6-Month EMA ratio.</p>
       
       <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '1rem' }}>
         <thead>
           <tr style={{ background: '#f8f9fa', textAlign: 'left' }}>
             <th style={{ padding: '1rem', borderBottom: '2px solid #dee2e6' }}>Loyalty Number</th>
             <th style={{ padding: '1rem', borderBottom: '2px solid #dee2e6' }}>Segment Persona</th>
-            <th style={{ padding: '1rem', borderBottom: '2px solid #dee2e6' }}>Lifetime Value</th>
-            <th style={{ padding: '1rem', borderBottom: '2px solid #dee2e6' }}>Q1 &rarr; Q2 Flights</th>
+            <th style={{ padding: '1rem', borderBottom: '2px solid #dee2e6' }}>Momentum (3M/6M)</th>
             <th style={{ padding: '1rem', borderBottom: '2px solid #dee2e6' }}>Churn Risk</th>
             <th style={{ padding: '1rem', borderBottom: '2px solid #dee2e6' }}>Recommended Action</th>
           </tr>
@@ -53,29 +52,26 @@ function App() {
         <tbody>
           {data.action_queue.map((user) => {
             let btnText = 'Deploy Intervention';
-            let btnColor = '#0f172a'; // Default Dark
+            let btnColor = '#0f172a';
             
             if (user['Persona'] === 'High-Value Business') {
-              btnText = 'Extend Status Tier';
-              btnColor = '#1d4ed8'; // Blue
+              btnText = 'Extend Status Tier'; btnColor = '#1d4ed8';
             } else if (user['Persona'] === 'Occasional Savers') {
-              btnText = 'Send 1.5x Point Multiplier';
-              btnColor = '#15803d'; // Green
+              btnText = 'Send 1.5x Point Multiplier'; btnColor = '#15803d';
             } else if (user['Persona'] === 'Steady Commuters') {
-              btnText = 'Offer Commuter Bundle';
-              btnColor = '#7e22ce'; // Purple
+              btnText = 'Offer Commuter Bundle'; btnColor = '#7e22ce';
             } else if (user['Persona'] === 'At-Risk Inactives') {
-              btnText = 'Send Win-Back Email';
-              btnColor = '#ea580c'; // Orange
+              btnText = 'Send Win-Back Email'; btnColor = '#ea580c';
             }
 
             return (
               <tr key={user['Loyalty Number']} style={{ borderBottom: '1px solid #eee' }}>
                 <td style={{ padding: '1rem', fontWeight: 'bold' }}>{user['Loyalty Number']}</td>
                 <td style={{ padding: '1rem' }}>{user['Persona']}</td>
-                <td style={{ padding: '1rem' }}>${Math.round(user['CLV']).toLocaleString()}</td>
                 <td style={{ padding: '1rem' }}>
-                  {user['Q1_Flights']} &rarr; <span style={{ color: user['Q2_Flights'] < user['Q1_Flights'] ? 'red' : 'black', fontWeight: user['Q2_Flights'] < user['Q1_Flights'] ? 'bold' : 'normal' }}>{user['Q2_Flights']}</span>
+                  <span style={{ color: user['Flight_EMA_Ratio'] < 1 ? 'red' : 'green', fontWeight: 'bold' }}>
+                    {user['Flight_EMA_Ratio'].toFixed(2)}x
+                  </span>
                 </td>
                 <td style={{ padding: '1rem' }}>
                   <span style={{ background: '#fee2e2', color: '#991b1b', padding: '4px 8px', borderRadius: '4px', fontWeight: 'bold' }}>

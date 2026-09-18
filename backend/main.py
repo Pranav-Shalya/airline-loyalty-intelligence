@@ -27,21 +27,17 @@ def get_dashboard():
     high_risk_threshold = 0.60
     at_risk_df = df[df['Churn_Probability'] >= high_risk_threshold].copy()
     
-    # Calculate velocity drop to prioritize customers who just stopped flying
-    at_risk_df['Velocity_Delta'] = at_risk_df['Q2_Flights'] - at_risk_df['Q1_Flights']
-    
-    # KPIs
     total_active = len(df)
     total_at_risk = len(at_risk_df)
     revenue_at_risk = float(at_risk_df['CLV'].sum())
     
-    # Sort: Negative velocity first, then highest CLV, then highest risk probability
+    # Sort by the most severe deceleration (Flight_EMA_Ratio ascending), then CLV
     action_queue = at_risk_df.sort_values(
-        by=['Velocity_Delta', 'CLV', 'Churn_Probability'], 
+        by=['Flight_EMA_Ratio', 'CLV', 'Churn_Probability'], 
         ascending=[True, False, False]
     ).head(15)
     
-    queue_data = action_queue[['Loyalty Number', 'Persona', 'CLV', 'Q1_Flights', 'Q2_Flights', 'Churn_Probability']].to_dict(orient='records')
+    queue_data = action_queue[['Loyalty Number', 'Persona', 'CLV', 'Flight_EMA_Ratio', 'Points_6M_Var', 'Churn_Probability']].to_dict(orient='records')
     
     return {
         'kpis': {
